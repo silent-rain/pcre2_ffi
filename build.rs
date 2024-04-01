@@ -74,7 +74,7 @@ fn link_pcre2(pcre2_dir: PathBuf) {
     // 创建静态库文件
     // ar qc target pcre2/build/CMakeFiles/pcre2-posix-static.dir/src/pcre2posix.c.o
     let out_dir = env::var("OUT_DIR").unwrap();
-    let lib_path = PathBuf::from(out_dir.clone()).join("libpcre2posix.a");
+    let lib_path = PathBuf::from(out_dir.clone()).join("libpcre2.a");
     Command::new("ar")
         .args([
             "qc",
@@ -92,7 +92,7 @@ fn link_pcre2(pcre2_dir: PathBuf) {
     // 静态库的搜索路径
     println!("cargo:rustc-link-search=native={}", out_dir);
     // 链接静态库
-    println!("cargo:rustc-link-lib=static=pcre2posix");
+    println!("cargo:rustc-link-lib=static=pcre2");
 }
 
 /// 生成 Rust 绑定
