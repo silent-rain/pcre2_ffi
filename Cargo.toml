@@ -1,0 +1,12 @@
+[package]
+name = "pcre2_ffi"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+
+[build-dependencies]
+bindgen = "0.66.1"
+cc = "1.0.83"
+glob = "0.3.1"
