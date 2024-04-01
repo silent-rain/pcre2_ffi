@@ -35,8 +35,9 @@ fn main() {
         re_erroffset: 0,
         re_cflags: 0,
     };
+    // let mut regex: std::mem::MaybeUninit<regex_t> = std::mem::MaybeUninit::uninit();
 
-    let comp_error = unsafe { pcre2_regcomp(&mut regex, pattern.as_ptr(), 0) };
+    let comp_error = unsafe { pcre2_regcomp(&mut regex as *mut regex_t, pattern.as_ptr(), 0) };
     if comp_error != 0 {
         panic!("pcre2 regcomp failed with error code: {}", comp_error);
     }
@@ -51,7 +52,7 @@ fn main() {
             0,
         )
     };
-    if exec_error != 0 {
+    if exec_error <= 0 {
         panic!(
             "No match found or an error occurred with error code: {}",
             exec_error
