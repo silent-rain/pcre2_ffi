@@ -22,10 +22,9 @@ extern "C" {
 */
 
 fn main() {
-    let pattern = CString::new(r"(?<=\d{4})[^\s\d]{3,11}(?=[^\s])").expect("CString::new failed");
-    let subject = CString::new(
-        r#"a;jhgoqoghqoj0329 u0tyu10hg0h9Y0Y9827342482y(Y0y(G)\_)lajf;lqjfgqhgpqjopjqa=)_(^!@#$%^&_())9999999").expect("CString::new failed"#,
-    ).expect("reading text error");
+    let pattern =
+        CString::new(r#"(?<=\d{4})([^\s\d]{3,11})(?=[^\s])"#).expect("CString::new failed");
+    let subject = CString::new("a;jhgoqoghqoj0329 u0tyu10hg0h9Y0Y9827342482y(Y0y(G)_)lajf;lqjfgqhgpqjopjqa=)*(^!@#$%^&*())9999999").expect("reading text error");
 
     let mut regex = regex_t {
         re_pcre2_code: ptr::null_mut(),
