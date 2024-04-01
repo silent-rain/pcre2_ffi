@@ -1,4 +1,4 @@
-use std::{ffi::CString, ptr};
+use std::{ffi::CString, net::UdpSocket, ptr};
 
 use pcre2_sys::{pcre2_regcomp, pcre2_regexec, pcre2_regfree, regex_t, regmatch_t};
 
@@ -72,4 +72,14 @@ fn main() {
         // 释放编译的正则表达式
         pcre2_regfree(&mut regex as *mut regex_t);
     }
+
+    // 发送结果字符串到 Bash 脚本
+    send_to_bash(matched_string).expect("string sending failed");
+}
+
+// 发送数据到 Bash 脚本的函数
+fn send_to_bash(data: &str) -> std::io::Result<()> {
+    let socket = UdpSocket::bind("0.0.0.0:0")?;
+    socket.send_to(data.as_bytes(), "127.0.0.1:12345")?;
+    Ok(())
 }
