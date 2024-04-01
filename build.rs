@@ -1,3 +1,5 @@
+extern crate bindgen;
+
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
@@ -12,7 +14,9 @@ fn main() {
     // 编译 PCRE2 项目
     build_pcre2(pcre2_dir.clone()).expect("Failed to build project with cmake");
     // 链接 PCRE2 静态库
-    link_pcre2(pcre2_dir);
+    link_pcre2(pcre2_dir.clone());
+    // 生成 Rust 绑定
+    binding_pcre2(pcre2_dir);
 }
 
 /// 克隆 PCRE2 项目
@@ -47,6 +51,9 @@ fn build_pcre2(pcre2_dir: PathBuf) -> std::io::Result<()> {
     // 用生成的构建系统编译项目
     Command::new("cmake").arg("--build").arg(".").status()?;
 
+    // 退出构建目录
+    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    env::set_current_dir(manifest_dir)?;
     Ok(())
 }
 
@@ -65,20 +72,43 @@ fn link_pcre2(pcre2_dir: PathBuf) {
     }
 
     // 创建静态库文件
-    // ar rcs target pcre2/build/CMakeFiles/pcre2-posix-static.dir/src/pcre2posix.c.o
+    // ar qc target pcre2/build/CMakeFiles/pcre2-posix-static.dir/src/pcre2posix.c.o
     let out_dir = env::var("OUT_DIR").unwrap();
     let lib_path = PathBuf::from(out_dir.clone()).join("libpcre2posix.a");
     Command::new("ar")
         .args([
-            "rcs",
+            "qc",
             lib_path.to_str().unwrap(),
             pcre2posix_o_path.to_str().unwrap(),
         ])
         .status()
         .expect("Failed to create static library");
 
+    Command::new("ranlib")
+        .args([lib_path.to_str().unwrap()])
+        .status()
+        .expect("Failed to ranlib static library");
+
     // 静态库的搜索路径
     println!("cargo:rustc-link-search=native={}", out_dir);
     // 链接静态库
     println!("cargo:rustc-link-lib=static=pcre2posix");
+}
+
+/// 生成 Rust 绑定
+fn binding_pcre2(pcre2_dir: PathBuf) {
+    // 指定头文件的位置
+    let header_path = pcre2_dir.join("src/pcre2posix.h");
+
+    // 使用 bindgen 生成绑定
+    let bindings = bindgen::Builder::default()
+        .header(header_path.to_str().unwrap())
+        .generate()
+        .expect("Unable to generate bindings");
+
+    // 将绑定写入 bindings.rs 文件。
+    let out_path = PathBuf::from("./src").join("bindings.rs");
+    bindings
+        .write_to_file(out_path)
+        .expect("Couldn't write bindings!");
 }
