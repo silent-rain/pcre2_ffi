@@ -1,8 +1,6 @@
-#![allow(non_snake_case)]
-#![allow(non_camel_case_types)]
-include!(concat!("./bindings.rs"));
-
 use std::{ffi::CString, ptr};
+
+use pcre2_sys::{pcre2_regcomp, pcre2_regexec, pcre2_regfree, regex_t, regmatch_t};
 
 /*
 // ffi
