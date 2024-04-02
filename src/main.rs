@@ -86,7 +86,7 @@ fn get_error_message(error_code: c_int, compiled_regex: *const regex_t) -> Strin
 /// 发送数据到 Bash 脚本的函数
 fn send_to_bash(data: &str) -> std::io::Result<()> {
     let socket = UdpSocket::bind("127.0.0.1:0")?;
-    socket.send_to(data.as_bytes(), "127.0.0.1:34254")?;
+    socket.send_to(data.as_bytes(), "127.0.0.1:10001")?;
     println!("send data: {:?}", data);
     Ok(())
 }

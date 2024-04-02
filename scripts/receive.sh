@@ -26,15 +26,8 @@ fi
 
 
 # 定义接收 UDP 数据的端口
-PORT=34254
+PORT=10001
 
 echo "开始监听端口: $PORT"
 # 使用 nc (netcat) 监听指定端口的 UDP 数据
-nc -lu 127.0.0.1 $PORT
-# nc -luv 127.0.0.1 $PORT
-# nc -nluv 127.0.0.1 $PORT
-
-# 使用 nc (netcat) 监听指定端口的 UDP 数据，并打印接收到的每条消息
-# while IFS= read -r line; do
-#     echo "接收到: $line"
-# done < <(nc -nluv 127.0.0.1 $PORT)
+nc -l -u -p $PORT
